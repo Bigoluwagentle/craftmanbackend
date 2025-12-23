@@ -1,25 +1,13 @@
-const nodemailer = require("nodemailer");
+const sgMail = require('@sendgrid/mail');
 
-const createTransporter = () => {
-  // Use SendGrid instead of Gmail
-  return nodemailer.createTransport({
-    host: "smtp.sendgrid.net",
-    port: 587,
-    secure: false,
-    auth: {
-      user: "apikey",
-      pass: process.env.SENDGRID_API_KEY,
-    },
-  });
-};
+// Set SendGrid API Key
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const sendVerificationEmail = async (email, name, verificationCode) => {
-  const transporter = createTransporter();
-
-  const mailOptions = {
-    from: "gentleprimenetflix@gmail.com", // Your verified SendGrid sender
+  const msg = {
     to: email,
-    subject: "Verify Your Craftsman Account",
+    from: 'gentleprimenetflix@gmail.com', // Your verified sender
+    subject: 'Verify Your Craftsman Account',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #007bff;">Welcome to Craftsman Platform!</h2>
@@ -37,25 +25,22 @@ const sendVerificationEmail = async (email, name, verificationCode) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log("Verification email sent to:", email);
+    await sgMail.send(msg);
+    console.log('✅ Verification email sent to:', email);
     return true;
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error('❌ Error sending email:', error.response ? error.response.body : error);
     return false;
   }
 };
 
 const sendPasswordResetEmail = async (email, name, resetToken) => {
-  const transporter = createTransporter();
-
-  // Use CLIENT_URL for production
   const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
 
-  const mailOptions = {
-    from: "gentleprimenetflix@gmail.com", // Your verified SendGrid sender
+  const msg = {
     to: email,
-    subject: "Reset Your Password",
+    from: 'gentleprimenetflix@gmail.com', // Your verified sender
+    subject: 'Reset Your Password',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #007bff;">Password Reset Request</h2>
@@ -74,11 +59,11 @@ const sendPasswordResetEmail = async (email, name, resetToken) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log("Password reset email sent to:", email);
+    await sgMail.send(msg);
+    console.log('✅ Password reset email sent to:', email);
     return true;
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error('❌ Error sending email:', error.response ? error.response.body : error);
     return false;
   }
 };
