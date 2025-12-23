@@ -1,12 +1,14 @@
 const nodemailer = require("nodemailer");
 
 const createTransporter = () => {
- 
+  // Use SendGrid instead of Gmail
   return nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.sendgrid.net",
+    port: 587,
+    secure: false,
     auth: {
-      user: process.env.EMAIL_USER, 
-      pass: process.env.EMAIL_PASSWORD, 
+      user: "apikey",
+      pass: process.env.SENDGRID_API_KEY,
     },
   });
 };
@@ -15,7 +17,7 @@ const sendVerificationEmail = async (email, name, verificationCode) => {
   const transporter = createTransporter();
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: "gentleprimenetflix@gmail.com", // Your verified SendGrid sender
     to: email,
     subject: "Verify Your Craftsman Account",
     html: `
@@ -47,10 +49,11 @@ const sendVerificationEmail = async (email, name, verificationCode) => {
 const sendPasswordResetEmail = async (email, name, resetToken) => {
   const transporter = createTransporter();
 
-  const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}`;
+  // Use CLIENT_URL for production
+  const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: "gentleprimenetflix@gmail.com", // Your verified SendGrid sender
     to: email,
     subject: "Reset Your Password",
     html: `
