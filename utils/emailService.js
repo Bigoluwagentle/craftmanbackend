@@ -1,12 +1,11 @@
 const sgMail = require('@sendgrid/mail');
 
-// Set SendGrid API Key
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const sendVerificationEmail = async (email, name, verificationCode) => {
   const msg = {
     to: email,
-    from: 'gentleprimenetflix@gmail.com', // Your verified sender
+    from: 'gentleprimenetflix@gmail.com', 
     subject: 'Verify Your Craftsman Account',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -39,7 +38,7 @@ const sendPasswordResetEmail = async (email, name, resetToken) => {
 
   const msg = {
     to: email,
-    from: 'gentleprimenetflix@gmail.com', // Your verified sender
+    from: 'gentleprimenetflix@gmail.com',
     subject: 'Reset Your Password',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
