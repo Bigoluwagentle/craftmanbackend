@@ -177,7 +177,6 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -190,7 +189,6 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-   
     res.json({
       _id: user._id,
       name: user.name,
@@ -198,6 +196,8 @@ const loginUser = async (req, res) => {
       role: user.role,
       phone: user.phone,
       isVerified: user.isVerified,
+      profilePicture: user.profilePicture,      
+      subscription: user.subscription,       
       token: generateToken(user._id),
     });
   } catch (error) {
