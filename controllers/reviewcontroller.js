@@ -49,7 +49,7 @@ const createReview = async (req, res) => {
 
     const populatedReview = await Review.findById(review._id).populate(
       "clientId",
-      "name"
+      "name profilePicture" 
     );
 
     res.status(201).json({
@@ -64,7 +64,7 @@ const createReview = async (req, res) => {
 const getArtisanReviews = async (req, res) => {
   try {
     const reviews = await Review.find({ artisanId: req.params.artisanId })
-      .populate("clientId", "name")
+      .populate("clientId", "name profilePicture") 
       .sort({ createdAt: -1 });
 
     res.json(reviews);
@@ -80,7 +80,7 @@ const getMyReviews = async (req, res) => {
         path: "artisanId",
         populate: {
           path: "userId",
-          select: "name",
+          select: "name profilePicture", 
         },
       })
       .sort({ createdAt: -1 });
