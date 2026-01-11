@@ -3,15 +3,19 @@ const Artisan = require("../models/Artisan");
 
 const getUnverifiedArtisans = async (req, res) => {
   try {
-    const unverifiedUsers = await User.find({
+    const emailVerifiedUsers = await User.find({
       role: "artisan",
-      isVerified: false,
-    }).select("-password");
+      isVerified: true, 
+    }).select("_id");
 
-    const userIds = unverifiedUsers.map((user) => user._id);
-    const artisanProfiles = await Artisan.find({ userId: { $in: userIds } }).populate(
+    const userIds = emailVerifiedUsers.map((user) => user._id);
+    
+    const artisanProfiles = await Artisan.find({ 
+      userId: { $in: userIds },
+      isVerified: false 
+    }).populate(
       "userId",
-      "name email phone isVerified createdAt"
+      "name email phone isVerified createdAt profilePicture" 
     );
 
     res.json(artisanProfiles);
@@ -22,15 +26,19 @@ const getUnverifiedArtisans = async (req, res) => {
 
 const getVerifiedArtisans = async (req, res) => {
   try {
-    const verifiedUsers = await User.find({
+    const emailVerifiedUsers = await User.find({
       role: "artisan",
-      isVerified: true,
-    }).select("-password");
+      isVerified: true, 
+    }).select("_id");
 
-    const userIds = verifiedUsers.map((user) => user._id);
-    const artisanProfiles = await Artisan.find({ userId: { $in: userIds } }).populate(
+    const userIds = emailVerifiedUsers.map((user) => user._id);
+    
+    const artisanProfiles = await Artisan.find({ 
+      userId: { $in: userIds },
+      isVerified: true 
+    }).populate(
       "userId",
-      "name email phone isVerified createdAt"
+      "name email phone isVerified createdAt profilePicture" 
     );
 
     res.json(artisanProfiles);
@@ -51,10 +59,16 @@ const verifyArtisan = async (req, res) => {
       return res.status(400).json({ message: "User is not an artisan" });
     }
 
-    user.isVerified = true;
-    await user.save();
+    const artisan = await Artisan.findOne({ userId: user._id });
+    
+    if (!artisan) {
+      return res.status(404).json({ message: "Artisan profile not found" });
+    }
 
-    res.json({ message: "Artisan verified successfully", user });
+    artisan.isVerified = true;
+    await artisan.save();
+
+    res.json({ message: "Artisan verified successfully", artisan });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -72,10 +86,16 @@ const unverifyArtisan = async (req, res) => {
       return res.status(400).json({ message: "User is not an artisan" });
     }
 
-    user.isVerified = false;
-    await user.save();
+    const artisan = await Artisan.findOne({ userId: user._id });
+    
+    if (!artisan) {
+      return res.status(404).json({ message: "Artisan profile not found" });
+    }
 
-    res.json({ message: "Artisan unverified successfully", user });
+    artisan.isVerified = false;
+    await artisan.save();
+
+    res.json({ message: "Artisan unverified successfully", artisan });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
